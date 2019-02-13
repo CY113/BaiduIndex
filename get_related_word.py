@@ -6,14 +6,15 @@
 严格按照百度指数上的时间段作为起始日期
 """
 import datetime
+import random
 from urllib.parse import quote
 import requests
 import json
 from DBHelper import DBHelper
+from config import COOKIES, IP_Pool
 
 headers = {
-    'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36",
-    'Cookie': "BAIDUID=D9EC96A2BCC8FE5180ECCE103DE9B287:FG=1; BIDUPSID=D9EC96A2BCC8FE5180ECCE103DE9B287; PSTM=1544279256; MCITY=-%3A; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; BDUSS=jhneTVqZ0tRNHJld0RxV1VuaXdkQXdMQ1NkbXJCVjM0WXpFNFg3R0NUM2FjMXBjQVFBQUFBJCQAAAAAAAAAAAEAAAAy9rZS6rvYrezhzOwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANrmMlza5jJcd; H_PS_PSSID=1438_21106_28205_28132_26350_28266_27244; Hm_lvt_d101ea4d2a5c67dab98251f0b5de24dc=1546843709,1546848801,1546855885,1546927315; bdindexid=qi14jh2aju36phk6dbktdqtau7; Hm_lpvt_d101ea4d2a5c67dab98251f0b5de24dc=1546927428"
+    'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
 }
 
 
@@ -24,22 +25,32 @@ class DemandMap():
         self.url = "http://index.baidu.com/Interface/Newwordgraph?word={}&datelist=".format(
             quote(keyword))
 
-    def get_data(self):
+    def get_data(self,cookies=random.choice(COOKIES)):
         """
         根据不同时间段获取响应 并存储数据库
         :return:
         """
+        proxies = {
+            "http": "http://182.99.219.56:4276",
+        }
         for date in self.date_range_list:
             start_url = self.url + str(date)
-            response = requests.get(start_url, headers=headers)
+            headers['Cookie'] = cookies
+            response = requests.get(start_url, headers=headers,proxies = proxies)
             if response.status_code == 200:
                 response.encoding = 'utf-8'
-                data = json.loads(response.text)['data'][date]
-                for i in range(len(data)):
-                    word,count = data[i].split('\t')
-                    sql = "INSERT INTO demand_map(related_word,count,keyword,date) VALUES (%s, %s, %s, %s)"
-                    params = (word,count,self._keywords,date)
-                    DBHelper().insert_task(sql,params)
+                data = json.loads(response.text)
+                if data['data'] != []:
+                    datas = data['data'][date]
+                    for i in range(len(datas)):
+                        word,count = datas[i].split('\t')
+                        sql = "INSERT INTO demand_map(related_word,count,keyword,date) VALUES (%s, %s, %s, %s)"
+                        params = (word,count,self._keywords,date)
+                        print('正在插入数据库')
+                        DBHelper().insert_task(sql,params)
+                else:
+                    print('没有该关键词' + ":" + self._keywords)
+                    break
             else:
                 print('失败')
                 print(start_url)
@@ -62,5 +73,8 @@ class DemandMap():
 
 
 if __name__ == '__main__':
-    DemandMap = DemandMap('劲霸','2018-06-03', '2018-12-30') # 时间按照百度指数上的日期，其他日期没有数据，间隔为周
-    DemandMap.get_data()
+    sql = 'SELECT DISTINCT(`描述关键词串`) from task3'
+    keywords = DBHelper().query_task(sql)
+    for keyword in keywords:
+        D = DemandMap(keyword[0],'2018-12-02', '2018-12-30') # 时间按照百度指数上的日期，其他日期没有数据，间隔为周
+        D.get_data()

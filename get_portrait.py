@@ -4,17 +4,21 @@
 """
 
 import datetime
+import random
+from multiprocessing.dummy import Pool as ThreadPool
 from urllib.parse import quote
 import requests
 import json
-
+import pandas as pd
+import numpy as np
 from DBHelper import DBHelper
+from config import COOKIES, IP_Pool
+import time
 
 headers = {
-    'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36",
-    'Cookie': "BAIDUID=D9EC96A2BCC8FE5180ECCE103DE9B287:FG=1; BIDUPSID=D9EC96A2BCC8FE5180ECCE103DE9B287; PSTM=1544279256; MCITY=-%3A; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; bdindexid=qi14jh2aju36phk6dbktdqtau7; indexpro=dtq3tjiq7v1kgc6shtasm2cr46; BDUSS=09XUEpZSDFyZ053dThHTG10MENZbERuSGZCQlJHV0hIdE03aVUzY1VuVWY5VnRjQVFBQUFBJCQAAAAAAAAAAAEAAADv27jpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB9oNFwfaDRcS; CHKFORREG=545275368d76f03b5fa3504aa5c4f132; H_PS_PSSID=1438_21106_28205_28132_26350_28266_27244; delPer=0; PSINO=2; BDRCVFR[feWj1Vr5u3D]=I67x6TjHwwYf0; Hm_lvt_d101ea4d2a5c67dab98251f0b5de24dc=1546855885,1546927315,1546938382,1546943550; Hm_lpvt_d101ea4d2a5c67dab98251f0b5de24dc=1546943554"
+    'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"
 }
-
+proxies = {"http":random.choice(IP_Pool)}
 
 class Portrait():
     def __init__(self, keyword, startdate, enddate):
@@ -26,14 +30,21 @@ class Portrait():
     def get_data(self):
         for date in self.date_range_list:
             start_url = self.url.format(date[0], date[1])
-            response = requests.get(start_url, headers=headers)
+            headers['Cookie'] = random.choice(COOKIES)
+            response = requests.get(start_url, headers=headers,proxies = {"http": random.choice(IP_Pool)})
+            time.sleep(1)
             if response.status_code == 200:
                 data = json.loads(response.text)
-                keyword = data['data']['region'][0]['key']
-                prov = data['data']['region'][0]['prov']
-                city = data['data']['region'][0]['city']
-                self.insert_prov(keyword, prov, date)
-                self.insert_city(keyword, city, date)
+                if data['data'] !='':
+                    keyword = data['data']['region'][0]['key']
+                    prov = data['data']['region'][0]['prov']
+                    city = data['data']['region'][0]['city']
+                    print('正在插入数据库')
+                    self.insert_prov(keyword, prov, date)
+                    self.insert_city(keyword, city, date)
+                else:
+                    print('没有该关键词' + ":" + self._keyword )
+                    break
             else:
                 print('失败')
                 print(start_url)
@@ -46,10 +57,13 @@ class Portrait():
         :param date: 日期
         :return:
         """
-        for key, value in prov.items():
-            sql = "insert into province_index(keyword,prov,prov_index,date) values(%s,%s,%s,%s) "
-            params = (keyword, key, value, str(date))
-            DBHelper().insert_task(sql, params)
+        try:
+            for key, value in prov.items():
+                sql = "insert into province_index(keyword,prov,prov_index,date) values(%s,%s,%s,%s) "
+                params = (keyword, key, value, str(date))
+                DBHelper().insert_task(sql, params)
+        except Exception:
+            print('数据为空')
 
     def insert_city(self, keyword, city, date):
         """
@@ -59,10 +73,13 @@ class Portrait():
         :param date: 日期
         :return:
         """
-        for key, value in city.items():
-            sql = "insert into city_index(keyword,city,city_index,date) values(%s,%s,%s,%s)"
-            params = (keyword, key, value, str(date))
-            DBHelper().insert_task(sql, params)
+        try:
+            for key, value in city.items():
+                sql = "insert into city_index(keyword,city,city_index,date) values(%s,%s,%s,%s)"
+                params = (keyword, key, value, str(date))
+                DBHelper().insert_task(sql, params)
+        except Exception:
+            print('数据为空')
 
 
     def get_time_range_list(self, startdate, enddate):
@@ -86,5 +103,8 @@ class Portrait():
 
 
 if __name__ == '__main__':
-    Portrait = Portrait('胡歌', '2018-06-03', '2018-12-30')
-    Portrait.get_data()
+    sql = 'SELECT DISTINCT(`描述关键词串`) from task3'
+    keywords = DBHelper().query_task(sql)
+    for keyword in keywords:
+        P= Portrait(keyword[0], '2018-06-03', '2018-12-30')
+        P.get_data()

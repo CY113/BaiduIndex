@@ -9,10 +9,10 @@ import pymysql
 
 class DBHelper(object):
     def __init__(self):
-        self.host = "db.test.moheah.com"
+        self.host = "127.0.0.1"
         self.port = 3306
         self.user = 'baiduindex'
-        self.password = 'Baiduindex!!'
+        self.password = '123456'
         self.db = 'baiduindexdb'
 
     def connect_database(self):

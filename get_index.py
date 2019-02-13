@@ -4,7 +4,9 @@
 
 
 """
-from config import COOKIES, PROVINCE_CODE, CITY_CODE
+import random
+
+from config import COOKIES, PROVINCE_CODE, CITY_CODE, IP_Pool
 from urllib.parse import urlencode
 from collections import defaultdict
 import datetime
@@ -17,7 +19,7 @@ headers = {
     'X-Requested-With': 'XMLHttpRequest',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
 }
-
+proxies = {"https":random.choice(IP_Pool)}
 
 class BaiduIndex:
     """
@@ -39,9 +41,9 @@ class BaiduIndex:
         :param end_date: 终止日期
         :param area: 地区，默认为全国
         """
-        self._keywords = keywords if isinstance(keywords, list) else keywords.split(',') # 如果关键词是列表返回，不是用，分隔开
+        self._keywords =  keywords if isinstance(keywords, list) else keywords.split(',')
         self._time_range_list = self.get_time_range_list(start_date, end_date)
-        self._all_kind = ['all', 'pc', 'wise']
+        self._all_kind = ['all']
         self._area = area
         self.result = {keyword: defaultdict(list) for keyword in self._keywords}
         self.get_result()
@@ -52,12 +54,17 @@ class BaiduIndex:
         :return:
         """
         for start_date, end_date in self._time_range_list:
-            encrypt_datas, uniqid = self.get_encrypt_datas(start_date, end_date) # 获取加密参数
-            key = self.get_key(uniqid)
-            for encrypt_data in encrypt_datas:
-                for kind in self._all_kind:
-                    encrypt_data[kind]['data'] = self.decrypt_func(key, encrypt_data[kind]['data'])
-                self.format_data(encrypt_data)
+            result = self.get_encrypt_datas(start_date, end_date)
+            if result == (None,None):
+                print('没有该关键词'+":" +str(self._keywords))
+                break
+            else:
+                encrypt_datas, uniqid = result # 获取加密参数
+                key = self.get_key(uniqid)
+                for encrypt_data in encrypt_datas:
+                    for kind in self._all_kind:
+                        encrypt_data[kind]['data'] = self.decrypt_func(key, encrypt_data[kind]['data'])
+                    self.format_data(encrypt_data)
 
     def get_encrypt_datas(self, start_date, end_date):
         """
@@ -73,11 +80,15 @@ class BaiduIndex:
         url = 'http://index.baidu.com/api/SearchApi/index?' + urlencode(request_args)
         html = self.http_get(url)
         datas = json.loads(html)
-        uniqid = datas['data']['uniqid']
-        encrypt_datas = []
-        for single_data in datas['data']['userIndexes']:
-            encrypt_datas.append(single_data)
-        return (encrypt_datas, uniqid)
+        if datas['data'] != '':
+            uniqid = datas['data']['uniqid']
+            encrypt_datas = []
+            for single_data in datas['data']['userIndexes']:
+                encrypt_datas.append(single_data)
+            return (encrypt_datas, uniqid)
+        else:
+            return (None,None)
+
 
     def get_key(self, uniqid):
         """
@@ -115,9 +126,11 @@ class BaiduIndex:
         return self.result[keyword][kind]
 
     @staticmethod
-    def http_get(url, cookies=COOKIES):
+    def http_get(url, cookies=random.choice(COOKIES)):
         headers['Cookie'] = cookies
-        response = requests.get(url, headers=headers)
+        # response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers,proxies =proxies) # 使用代理
+        print("当前请求IP地址为：" + str(proxies["https"]))
         if response.status_code == 200:
             return response.text
         else:
