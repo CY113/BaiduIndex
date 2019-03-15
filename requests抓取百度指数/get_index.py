@@ -6,7 +6,7 @@
 """
 import random
 
-from config import COOKIES, PROVINCE_CODE, CITY_CODE, IP_Pool
+from requests抓取百度指数.config import COOKIES, PROVINCE_CODE, CITY_CODE, IP_Pool
 from urllib.parse import urlencode
 from collections import defaultdict
 import datetime

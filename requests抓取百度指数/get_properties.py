@@ -8,10 +8,10 @@ import random
 import time
 from urllib.parse import quote
 import requests
-from DBHelper import DBHelper
+from requests抓取百度指数.DBHelper import DBHelper
 
 # 固定时间段为1个月，手动更改日期段列表
-from config import COOKIES
+from requests抓取百度指数.config import COOKIES
 
 date_range_list = [
     (20180601, 20180701),

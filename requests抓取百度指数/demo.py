@@ -1,10 +1,7 @@
 # coding=utf-8
-from multiprocessing.pool import ThreadPool
 
-from DBHelper import DBHelper
-from get_index import BaiduIndex
-import pandas as pd
-import numpy as np
+from requests抓取百度指数.DBHelper import DBHelper
+from requests抓取百度指数.get_index import BaiduIndex
 
 
 def main(keyword):

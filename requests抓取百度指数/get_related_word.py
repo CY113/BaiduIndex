@@ -10,8 +10,8 @@ import random
 from urllib.parse import quote
 import requests
 import json
-from DBHelper import DBHelper
-from config import COOKIES, IP_Pool
+from requests抓取百度指数.DBHelper import DBHelper
+from requests抓取百度指数.config import COOKIES
 
 headers = {
     'User-Agent': "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36"

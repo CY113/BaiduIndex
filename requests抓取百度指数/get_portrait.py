@@ -5,14 +5,11 @@
 
 import datetime
 import random
-from multiprocessing.dummy import Pool as ThreadPool
 from urllib.parse import quote
 import requests
 import json
-import pandas as pd
-import numpy as np
-from DBHelper import DBHelper
-from config import COOKIES, IP_Pool
+from requests抓取百度指数.DBHelper import DBHelper
+from requests抓取百度指数.config import COOKIES, IP_Pool
 import time
 
 headers = {
