@@ -9,6 +9,8 @@ import json
 import random
 from urllib.parse import quote
 import scrapy
+from scrapy.utils.project import get_project_settings
+
 from ScrapyBaidu.settings import COOKIES
 from item.Related_Word_Item import RelatedWordItem
 from tools.QueryData import QueryData
@@ -20,9 +22,10 @@ class RelatedWordSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super(RelatedWordSpider, self).__init__(*args, **kwargs)
         self.base_url = 'http://index.baidu.com/Interface/Newwordgraph?word={}&datelist='
-        # self.keywords = QueryData().get_keyword()
-        self.keywords = [("lol",),]
-        self.date_range_list = self.get_time_range_list('2018-12-02','2018-12-30')
+        self.keywords = QueryData().get_keyword()
+        self.settings = get_project_settings()
+        self.date_range_list = self.get_time_range_list(self.settings["START_DATE"],
+                                                        self.settings["END_DATE"])
 
     def get_time_range_list(self, startdate, enddate):
         """
@@ -43,9 +46,9 @@ class RelatedWordSpider(scrapy.Spider):
     def start_requests(self):
         for keyword in self.keywords:
             for date in self.date_range_list:
-                start_url = self.base_url.format(quote(keyword[0])) + str(date)
+                start_url = self.base_url.format(quote(keyword)) + str(date)
                 yield scrapy.Request(url=start_url, callback=self.parse,
-                                     cookies=random.choice(COOKIES),meta={'date':date})
+                                     cookies=random.choice(COOKIES), meta={'date': date})
 
     def parse(self, response):
         result = json.loads(response.body.decode('utf-8'))
@@ -64,4 +67,3 @@ class RelatedWordSpider(scrapy.Spider):
 
         else:
             print("未收录该关键词")
-

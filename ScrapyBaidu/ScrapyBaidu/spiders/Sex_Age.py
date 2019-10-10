@@ -36,7 +36,7 @@ class SexAgeSpider(scrapy.Spider):
     def start_requests(self):
         for keyword in self.keywords:
             for date in self.date_range_list:
-                start_url = self.base_url.format(quote(keyword[0]),date[0], date[1])
+                start_url = self.base_url.format(quote(keyword),date[0], date[1])
                 yield scrapy.Request(url=start_url,callback=self.parse,cookies=random.choice(COOKIES))
 
 

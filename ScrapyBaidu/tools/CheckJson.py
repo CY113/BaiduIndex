@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2018/2/7 15:51
-# @Author  : Hunk
-# @Email   : qiang.liu@ikooo.cn
-# @File    : util.py.py
-# @Software: PyCharm
+# coding=utf-8
+# @ Author: TianHao
+# @ Python: Python3.6.1
+# @ Date: 2018/03/10 16:21
+# @ Desc : 判断是否符合Json格式
 import json
 
 
 def check_json_format(raw_msg):
     """
     判断是否符合Json格式
-    :param self:
-    :return:
+    :param self: data
+    :return: 布尔值
     """
     if isinstance(raw_msg, str):  # 首先判断变量是否为字符串
         try:

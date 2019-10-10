@@ -89,6 +89,18 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+# 抓取起始时间与结束时间
+START_DATE = "2019-01-01"
+END_DATE = "2019-01-31"
+
+# 更改数据库配置信息
+MYSQL_HOST = "localhost"
+MYSQL_DBNAME = 'baiduindexdb'  # 数据库名字
+MYSQL_USER = 'root'  # 数据库账号
+MYSQL_PASSWD = '123456'  # 数据库密码
+MYSQL_PORT = 3306
+
+# IP池
 IP_Pool = [
     "https://112.122.252.176:7946",
     "https://125.123.23.219:4226",
@@ -96,6 +108,7 @@ IP_Pool = [
     "https://182.38.77.218:4213",
 ]
 
+# Cookie池
 COOKIES = [
     {
         "BDUSS": "jBXYUdGZnhmZkxaMlhoM2hDQVhVQjJrR3N5R1c1VDhHQUxRN2tmNGsxfkhWS2hjQVFBQUFBJCQAAAAAAAAAAAEAAACcYXxwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMfHgFzHx4BcR"},

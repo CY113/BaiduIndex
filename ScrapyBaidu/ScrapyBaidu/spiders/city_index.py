@@ -2,8 +2,8 @@
 import datetime
 import json
 import random
-
 import scrapy
+from scrapy.utils.project import get_project_settings
 
 from ScrapyBaidu.settings import COOKIES
 from item.City_Index_Item import CityIndexItem
@@ -15,11 +15,12 @@ class CityIndexSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super(CityIndexSpider, self).__init__(*args, **kwargs)
+        self.settings = get_project_settings()
         self.base_url = 'https://index.baidu.com/api/SearchApi/region?region={}&word={}&startDate={}&endDate={}&days="'
         self.region_id = QueryData().get_region_id()
         self.keywords = QueryData().get_keyword()
-        self.date_range_list = self.get_time_range_list('2019-01-21',
-                                                        '2019-02-20')
+        self.date_range_list = self.get_time_range_list(self.settings["START_DATE"],
+                                                        self.settings["END_DATE"])
 
     def get_time_range_list(self, startdate, enddate):
         """
@@ -44,8 +45,7 @@ class CityIndexSpider(scrapy.Spider):
         for keyword in self.keywords:
             for region_id in self.region_id:
                 for date in self.date_range_list:
-                    start_url = self.base_url.format(region_id[0], str.lower(
-                        keyword[0]).strip(), date[0], date[1])
+                    start_url = self.base_url.format(region_id[0], keyword, date[0], date[1])
                     yield scrapy.Request(url=start_url, callback=self.parse,
                                          cookies=random.choice(COOKIES),
                                          meta={'region': region_id[0]})

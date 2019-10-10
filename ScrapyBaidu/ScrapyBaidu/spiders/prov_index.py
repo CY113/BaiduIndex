@@ -2,9 +2,8 @@
 import datetime
 import json
 import random
-
 import scrapy
-
+from scrapy.utils.project import get_project_settings
 from ScrapyBaidu.settings import COOKIES
 from item.Prov_Index_Item import ProvIndexItem
 from tools.QueryData import QueryData
@@ -15,15 +14,18 @@ class ProvIndexSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super(ProvIndexSpider, self).__init__(*args, **kwargs)
+        self.settings = get_project_settings()
         self.base_url = 'https://index.baidu.com/api/SearchApi/region?region=0&word={}&startDate={}&endDate={}&days="'
         self.keywords = QueryData().get_keyword()
-        self.date_range_list = self.get_time_range_list('2018-06-03',
-                                                        '2018-12-30')
+        self.date_range_list = self.get_time_range_list(self.settings["START_DATE"],
+                                                        self.settings["END_DATE"])
 
     def get_time_range_list(self, startdate, enddate):
         """
         获取时间参数列表，以三十天为间隔
-        :return: date_range_list
+        :param startdate: 起始时间 --> str
+        :param enddate: 结束时间 --> str
+        :return: date_range_list -->list
         """
         date_range_list = []
         startdate = datetime.datetime.strptime(startdate, '%Y-%m-%d')
@@ -42,8 +44,7 @@ class ProvIndexSpider(scrapy.Spider):
     def start_requests(self):
         for keyword in self.keywords:
             for date in self.date_range_list:
-                start_url = self.base_url.format(str.lower(keyword[0]).strip(),
-                                                 date[0], date[1])
+                start_url = self.base_url.format(keyword, date[0], date[1])
                 yield scrapy.Request(url=start_url, callback=self.parse,
                                      cookies=random.choice(COOKIES))
 

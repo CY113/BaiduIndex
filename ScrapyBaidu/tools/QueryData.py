@@ -13,9 +13,12 @@ class QueryData(object):
         return self.db_helper.query_task(query_sql)
 
     def get_keyword(self):
+        keywords_list = []
         sql = 'SELECT 描述关键词串 FROM task6_child'
         keywords = self.db_helper.query_task(sql)
-        return keywords
+        for keyword in keywords:
+            keywords_list.append(str.lower(str(keyword[0])).strip())
+        return keywords_list
 
 
 if __name__ == '__main__':

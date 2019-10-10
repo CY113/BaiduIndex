@@ -1,8 +1,6 @@
-# coding=utf-8
+# coding= utf - 8
 """
 抓取一段时间内每一天关键词的搜索指数
-
-
 """
 import random
 
@@ -41,7 +39,7 @@ class BaiduIndex:
         :param end_date: 终止日期
         :param area: 地区，默认为全国
         """
-        self._keywords =  keywords if isinstance(keywords, list) else keywords.split(',')
+        self._keywords = keywords if isinstance(keywords, list) else keywords.split(',')
         self._time_range_list = self.get_time_range_list(start_date, end_date)
         self._all_kind = ['all']
         self._area = area
@@ -55,11 +53,11 @@ class BaiduIndex:
         """
         for start_date, end_date in self._time_range_list:
             result = self.get_encrypt_datas(start_date, end_date)
-            if result == (None,None):
-                print('没有该关键词'+":" +str(self._keywords))
+            if result == (None, None):
+                print('没有该关键词' + ":" + str(self._keywords))
                 break
             else:
-                encrypt_datas, uniqid = result # 获取加密参数
+                encrypt_datas, uniqid = result  # 获取加密参数
                 key = self.get_key(uniqid)
                 for encrypt_data in encrypt_datas:
                     for kind in self._all_kind:
@@ -87,8 +85,7 @@ class BaiduIndex:
                 encrypt_datas.append(single_data)
             return (encrypt_datas, uniqid)
         else:
-            return (None,None)
-
+            return (None, None)
 
     def get_key(self, uniqid):
         """
@@ -129,7 +126,7 @@ class BaiduIndex:
     def http_get(url, cookies=random.choice(COOKIES)):
         headers['Cookie'] = cookies
         # response = requests.get(url, headers=headers)
-        response = requests.get(url, headers=headers,proxies ={"https":random.choice(IP_Pool)}) # 使用代理
+        response = requests.get(url, headers=headers, proxies={"https": random.choice(IP_Pool)})  # 使用代理
         if response.status_code == 200:
             return response.text
         else:
@@ -146,7 +143,7 @@ class BaiduIndex:
         while 1:
             tempdate = startdate + datetime.timedelta(days=300)
             if tempdate > enddate:
-                all_days = (enddate-startdate).days
+                all_days = (enddate - startdate).days
                 date_range_list.append((startdate, enddate))
                 return date_range_list
             date_range_list.append((startdate, tempdate))
@@ -161,11 +158,12 @@ class BaiduIndex:
         i = data
         n = {}
         s = []
-        for o in range(len(a)//2):
-            n[a[o]] = a[len(a)//2 + o]
+        for o in range(len(a) // 2):
+            n[a[o]] = a[len(a) // 2 + o]
         for r in range(len(data)):
             s.append(n[i[r]])
         return ''.join(s).split(',')
+
 
 if __name__ == '__main__':
     pass
