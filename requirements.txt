@@ -1,4 +1,4 @@
 pandas==0.23.4
 numpy==1.15.1
-requests==2.19.1
+requests==2.20.0
 pymysql==0.9.3
