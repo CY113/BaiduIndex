@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import calendar
 import datetime
 import json
 import random
@@ -18,28 +19,47 @@ class CityIndexSpider(scrapy.Spider):
         self.settings = get_project_settings()
         self.base_url = 'https://index.baidu.com/api/SearchApi/region?region={}&word={}&startDate={}&endDate={}&days="'
         self.region_id = QueryData().get_region_id()
-        self.keywords = QueryData().get_keyword()
+        # self.keywords = QueryData().get_keyword()
+        self.keywords = ["爱奇艺"]
         self.date_range_list = self.get_time_range_list(self.settings["START_DATE"],
                                                         self.settings["END_DATE"])
 
-    def get_time_range_list(self, startdate, enddate):
+    # def get_time_range_list(self, startdate, enddate):
+    #     """
+    #     获取时间参数列表，以三十天为间隔
+    #     :return: date_range_list
+    #     """
+    #     date_range_list = []
+    #     startdate = datetime.datetime.strptime(startdate, '%Y-%m-%d')
+    #     enddate = datetime.datetime.strptime(enddate, '%Y-%m-%d')
+    #     while 1:
+    #         next_date = startdate + datetime.timedelta(days=7)
+    #         if next_date < enddate:
+    #             date_range_list.append((datetime.datetime.strftime(startdate,
+    #                                                                '%Y-%m-%d'),
+    #                                     datetime.datetime.strftime(next_date,
+    #                                                                '%Y-%m-%d')))
+    #             startdate = next_date
+    #         else:
+    #             return date_range_list
+    def get_time_range_list(self,startdate, enddate):
         """
-        获取时间参数列表，以三十天为间隔
-        :return: date_range_list
+        获取时间参数列表，按月计算
+        :param startdate: 起始时间 --> str
+        :param enddate: 结束时间 --> str
+        :return: date_range_list -->list
         """
         date_range_list = []
         startdate = datetime.datetime.strptime(startdate, '%Y-%m-%d')
         enddate = datetime.datetime.strptime(enddate, '%Y-%m-%d')
         while 1:
-            next_date = startdate + datetime.timedelta(days=7)
-            if next_date < enddate:
+            next_month = startdate + datetime.timedelta(days=calendar.monthrange(startdate.year, startdate.month)[1])
+            month_end = next_month - datetime.timedelta(days=1)
+            if month_end < enddate:
                 date_range_list.append((datetime.datetime.strftime(startdate,
                                                                    '%Y-%m-%d'),
-                                        datetime.datetime.strftime(next_date,
+                                        datetime.datetime.strftime(month_end,
                                                                    '%Y-%m-%d')))
-                startdate = next_date
-            else:
-                return date_range_list
 
     def start_requests(self):
         for keyword in self.keywords:

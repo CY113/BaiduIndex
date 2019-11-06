@@ -15,7 +15,7 @@ class CityIndexItem(scrapy.Item):
 
     # 数据库插入语句
     def get_insert_sql(self):
-        insert_sql = "insert into city_index_new(keyword,city,city_index,prov,date) values(%s,%s,%s,%s,%s)"
+        insert_sql = "insert into city_index(keyword,city,city_index,prov,date) values(%s,%s,%s,%s,%s)"
         params = (self['keyword'],self['city'],self['city_index'],self['prov'],self['date'],)
         return insert_sql, params
 

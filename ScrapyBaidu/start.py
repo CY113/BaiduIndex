@@ -47,7 +47,7 @@ def save_to_sql(params):
     :param params: 由keyword, index, date组成的元组 --》tuple
     :return:
     """
-    sql = "INSERT INTO baidu_index(keyword,_index, date) VALUES (%s, %s, %s)"
+    sql = "INSERT INTO baidu_index_0624(keyword,_index, date) VALUES (%s, %s, %s)"
     DBHelper().insert_task(sql, params)
 
 
@@ -69,9 +69,10 @@ def main(keywords_list, start_date, end_date):
 
 
 if __name__ == '__main__':
-    path = "E:/github/BaiduIndex/ScrapyBaidu/tools/0719.xlsx"  # 文件位置
+    path = "车型列表.xlsx"  # 文件位置
     column_name = "描述关键词串"  # 关键词列名
     keywords_list = get_key_from_excel(path, column_name)  # 获取关键词列表，此处从excel中提取
-    start_date = "2019-01-01"
-    end_date = "2019-01-31"
+    # keywords_list = ["荣威rx5"]
+    start_date = "2016-01-01"
+    end_date = "2018-12-31"
     main(keywords_list, start_date, end_date)  # 启动爬虫
