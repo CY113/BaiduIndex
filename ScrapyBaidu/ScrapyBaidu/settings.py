@@ -94,11 +94,10 @@ START_DATE = "2019-01-01"
 END_DATE = "2019-09-30"
 
 # 更改数据库配置信息
-
-MYSQL_HOST = "127.0.0.1"
-MYSQL_DBNAME = 'baiduindexdb'  # 数据库名字
-MYSQL_USER = 'root'  # 数据库账号
-MYSQL_PASSWD = '123456'  # 数据库密码
+MYSQL_HOST = ""
+MYSQL_DBNAME = ''  # 数据库名字
+MYSQL_USER = ''  # 数据库账号
+MYSQL_PASSWD = ''  # 数据库密码
 MYSQL_PORT = 3306
 
 # IP池

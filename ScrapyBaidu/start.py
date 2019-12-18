@@ -33,7 +33,6 @@ def get_key_from_mysql(table_name):
     """
     keyword_list = []
     sql = 'SELECT DISTINCT(`keyword`) from {}'.format(table_name)
-    from tools.DBHelper import DBHelper
     keywords = DBHelper().query_task(sql)
     for keyword in keywords:
         keyword_list.append(str.lower(str(keyword[0])).strip())
@@ -69,7 +68,7 @@ def main(keywords_list, start_date, end_date):
 
 
 if __name__ == '__main__':
-    path = "车型列表.xlsx"  # 文件位置
+    path = "test.xlsx"  # 文件位置
     column_name = "描述关键词串"  # 关键词列名
     keywords_list = get_key_from_excel(path, column_name)  # 获取关键词列表，此处从excel中提取
     # keywords_list = ["荣威rx5"]
