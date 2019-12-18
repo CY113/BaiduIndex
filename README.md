@@ -1,3 +1,12 @@
+# 百度指数
+## 1.概述
+&emsp;&emsp;通过对[百度指数](http://index.baidu.com/ "百度指数")的趋势研究、需求图谱和人群画像的数据抓取，分析目标关键词在不同时期真实的百度指数即热度。
+
+## 2.项目结构
+![](http://doc.intcolon.com/server/../Public/Uploads/2019-12-12/5df1edb6545ff.png)
+
+## 3.抓取步骤
+&emsp;&emsp;爬虫分为两部分。百度指数使用requests+json结构抓取，省份、城市等指数使用Scrapy框架抓取。
 ### 3.1 百度指数抓取
 #### 启动目录：
 1. start.py
@@ -52,3 +61,4 @@ IP_Pool = [
 
 #### 4.2 分析文件
 百度指数数据处理.ipynb
+
