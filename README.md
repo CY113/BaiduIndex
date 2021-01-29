@@ -1,4 +1,5 @@
 # 百度指数
+## 代码更新至新库：https://github.com/CY113/PythonSpider/tree/main/BaiduIndex
 ## 1.概述
 &emsp;&emsp;通过对[百度指数](http://index.baidu.com/ "百度指数")的趋势研究、需求图谱和人群画像的数据抓取，分析目标关键词在不同时期真实的百度指数即热度。
 
